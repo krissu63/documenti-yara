@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>Scatta Foto</title>
+</head>
+<body>
+    <h1>Foto scattata:</h1>
+    <!-- Aggiungi il tag img per visualizzare la foto -->
+    <img id="foto" src="" alt="Foto non disponibile" />
+
+    <script>
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    var video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    document.body.appendChild(video);
+                    setTimeout(function () {
+                        var canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        var dataUrl = canvas.toDataURL();
+                        
+                        // Imposta il src del tag img per visualizzare la foto scattata
+                        document.getElementById("foto").src = dataUrl;
+
+                        stream.getTracks().forEach(track => track.stop());
+                    }, 3000); // Dopo 3 secondi
+                })
+                .catch(function (err) {
+                    console.log("Errore: ", err);
+                });
+        } else {
+            alert("Fotocamera non supportata.");
+        }
+    </script>
+</body>
+</html>
